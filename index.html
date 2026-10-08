@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi Ticket — Mesa de Ayuda Lyncott</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
+:root{--bg:#F5F3EE;--surface:#fff;--surface2:#F0EDE6;--border:#E2DDD4;--red:#CC0000;--red-light:#FFF0F0;--text:#1A1714;--muted:#8A8278;--green:#1A7A4A;--green-bg:#EBF7F1;--orange:#C45E00;--orange-bg:#FFF4E8;--blue:#1A4FA0;--blue-bg:#EBF0FB}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',system-ui,sans-serif;min-height:100vh}
+.top-bar{height:4px;background:linear-gradient(90deg,var(--red) 0%,#FF4444 50%,var(--red) 100%);background-size:200% 100%;animation:shimmer 3s infinite}
+.top-bar.green{background:linear-gradient(90deg,var(--green),#00D085,var(--green)) !important}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.page{max-width:680px;margin:0 auto;padding:40px 20px 60px}
+.header{text-align:center;margin-bottom:40px}
+.logo-wrap{display:inline-flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);padding:8px 20px 8px 10px;border-radius:100px;margin-bottom:32px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.logo-sq{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:11px;color:#fff;background:var(--red)}
+.logo-text{font-family:'Syne',sans-serif;font-size:13px;font-weight:700}
+.header h1{font-family:'Syne',sans-serif;font-size:clamp(28px,5vw,42px);font-weight:800;line-height:1.1;margin-bottom:12px;letter-spacing:-1px}
+.header p{color:var(--muted);font-size:15px;line-height:1.6}
+.ticket-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.07);margin-bottom:20px;animation:fadeUp 0.5s ease both}
+.ticket-top{padding:28px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.ticket-id-label{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.ticket-id-num{font-family:'Syne',sans-serif;font-size:52px;font-weight:800;line-height:1;letter-spacing:-2px}
+.ticket-status-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.status-badge{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:100px;font-size:13px;font-weight:600}
+.dot{width:8px;height:8px;border-radius:50%}
+.status-proceso{background:var(--orange-bg);color:var(--orange)}.status-proceso .dot{background:var(--orange);animation:pulse 1.5s infinite}
+.status-abierto{background:var(--blue-bg);color:var(--blue)}.status-abierto .dot{background:var(--blue)}
+.status-atendido{background:var(--green-bg);color:var(--green)}.status-atendido .dot{background:var(--green)}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.ticket-date{font-size:12px;color:var(--muted)}
+.queue-section{padding:24px 28px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,#FFF8F8,#fff)}
+.section-label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+.queue-visual{display:flex;align-items:center;margin-bottom:16px;overflow-x:auto;padding-bottom:8px}
+.q-item{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0}
+.q-bubble{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:14px}
+.q-bubble.done{background:var(--green-bg);color:var(--green);border:1.5px solid #C0E8D2}
+.q-bubble.active{background:var(--orange-bg);color:var(--orange);border:2px solid #FFD4A0;box-shadow:0 0 0 4px rgba(196,94,0,.08)}
+.q-bubble.mine{background:var(--red);color:#fff;border:2px solid var(--red);box-shadow:0 0 0 5px rgba(204,0,0,.12);transform:scale(1.12)}
+.q-bubble.waiting{background:var(--surface2);color:var(--muted);border:1.5px solid var(--border)}
+.q-label{font-size:10px;color:var(--muted);font-weight:500}
+.q-label.mine{color:var(--red);font-weight:700;font-size:11px}
+.q-line{width:20px;height:2px;background:var(--border);margin-top:-22px;flex-shrink:0}
+.q-line.done{background:#C0E8D2}
+.queue-msg{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--red-light);border-radius:12px;border:1px solid rgba(204,0,0,.1);font-size:13px;line-height:1.5}
+.queue-msg strong{color:var(--red)}
+.ticket-details{padding:24px 28px}
+.details-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.detail-label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.detail-value{font-size:14px;font-weight:500}
+.detail-value.red{color:var(--red);font-weight:600}
+.tecnico-card{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--surface2);border-radius:12px;border:1px solid var(--border);margin-bottom:16px}
+.tec-avatar{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:#fff;flex-shrink:0}
+.tec-name{font-size:14px;font-weight:600}.tec-role{font-size:12px;color:var(--muted)}
+.desc-box{padding:14px 16px;background:var(--surface2);border-radius:12px;border:1px solid var(--border);font-size:14px;line-height:1.6;font-style:italic}
+.timeline-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px 28px;box-shadow:0 4px 24px rgba(0,0,0,.07);margin-bottom:20px;animation:fadeUp 0.5s 0.1s ease both}
+.card-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.card-title::before{content:'';width:3px;height:16px;border-radius:2px;background:var(--red)}
+.card-title.green::before{background:var(--green)}
+.tl{display:flex;flex-direction:column}
+.tl-row{display:flex;gap:14px;padding-bottom:18px;position:relative}
+.tl-row:last-child{padding-bottom:0}
+.tl-row:not(:last-child)::before{content:'';position:absolute;left:15px;top:34px;bottom:0;width:2px;background:var(--border)}
+.tl-icon{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;position:relative;z-index:1}
+.tl-icon.done{background:var(--green-bg)}.tl-icon.active{background:var(--orange-bg)}.tl-icon.pending{background:var(--surface2)}
+.tl-text{flex:1;padding-top:5px}
+.tl-title{font-size:14px;font-weight:600;margin-bottom:2px}.tl-title.dim{color:var(--muted);font-weight:400}
+.tl-time{font-size:12px;color:var(--muted)}
+.csat-btn{flex:1;padding:12px;border:1.5px solid var(--border);border-radius:12px;background:var(--surface2);cursor:pointer;font-size:22px;transition:all 0.2s}
+.csat-btn.selected{border-color:var(--green);background:var(--green-bg);transform:scale(1.1)}
+.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--red);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error-box{background:var(--red-light);border:1px solid rgba(204,0,0,.2);border-radius:16px;padding:24px;text-align:center;color:var(--red);margin:20px 0}
+.footer{text-align:center;font-size:12px;color:var(--muted);line-height:1.7}
+.footer a{color:var(--red);text-decoration:none;font-weight:500}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:500px){.details-grid{grid-template-columns:1fr}.ticket-id-num{font-size:38px}.page{padding:24px 16px 40px}}
+</style>
+</head>
+<body>
+<div class="top-bar" id="topBar"></div>
+<div class="page">
+  <div class="header">
+    <div class="logo-wrap">
+      <div class="logo-sq">MA</div>
+      <div class="logo-text">Mesa de Ayuda Lyncott</div>
+    </div>
+    <div id="headerContent">
+      <div style="text-align:center;padding:40px 0">
+        <div class="spinner"></div>
+        <div style="font-size:13px;color:var(--muted);letter-spacing:1px">BUSCANDO TU TICKET...</div>
+      </div>
+    </div>
+  </div>
+  <div id="mainContent"></div>
+  <div class="footer" id="footer" style="display:none">
+    ¿Tienes dudas? Escríbenos a <a href="mailto:soporte@lyncott.mx">soporte@lyncott.mx</a><br>
+    <span id="footerNote"></span>
+  </div>
+</div>
+
+<script>
+const JSON_URL = 'https://lyncott.sharepoint.com/sites/MesadeAyudaLyncott/SiteAssets/tickets.json';
+
+const getParam = n => new URLSearchParams(window.location.search).get(n);
+
+const formatDate = s => {
+  if (!s) return '—';
+  const d = new Date(s);
+  return d.toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'})+', '+d.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});
+};
+
+const getInitials = n => n ? n.split(' ').map(x=>x[0]).join('').toUpperCase().slice(0,2) : '?';
+const getEstado = t => t.EstadodelTicket0?.Value || t.EstadodelTicket0 || 'Abierto';
+const getTecnico = t => t.Personalqueatiendeelticket?.Value || t.Personalqueatiendeestasolicitud_?.Value || '—';
+const getCategoria = t => t.SeleccionaelSoporteTecnicodesead?.Value || t.SeleccionaelSoporteTecnicodesead || '—';
+const getPrioridad = t => t.Nivelesdeprioridad_x003a_?.Value || '—';
+const getSolucion = t => t.Soluci_x00f3_naticket_x003a_ || '';
+const getNombre = t => t.Escribetunombre_x003a_ || '—';
+const getUbicacion = t => t.Selecionatuubicacion_x003a_?.Value || '—';
+
+function renderProceso(ticket, abiertos) {
+  const id = ticket.ID;
+  const estado = getEstado(ticket);
+  const tecnico = getTecnico(ticket);
+  const antes = abiertos.filter(t => t.ID < id).length;
+  const fecha = formatDate(ticket.Fechadecreacion || ticket.Created);
+
+  // Fila visual — mostrar tickets cercanos
+  const idx = abiertos.findIndex(t => t.ID === id);
+  const start = Math.max(0, idx - 2);
+  const visibles = abiertos.slice(start, start + 6);
+
+  let filaHTML = visibles.map((t, i) => {
+    const e = getEstado(t);
+    let cls = 'waiting', icon = t.ID;
+    if (t.ID === id) { cls = 'mine'; }
+    else if (e === 'Atendido') { cls = 'done'; icon = '✓'; }
+    else if (e === 'En Proceso') { cls = 'active'; icon = '⚡'; }
+    const linea = i < visibles.length-1 ? `<div class="q-line ${e==='Atendido'?'done':''}"></div>` : '';
+    return `<div class="q-item"><div class="q-bubble ${cls}">${icon}</div><div class="q-label ${t.ID===id?'mine':''}">${t.ID===id?'← Tú':'#'+t.ID}</div></div>${linea}`;
+  }).join('');
+
+  const badge = estado === 'En Proceso'
+    ? `<div class="status-badge status-proceso"><div class="dot"></div>En proceso</div>`
+    : `<div class="status-badge status-abierto"><div class="dot"></div>Abierto</div>`;
+
+  document.getElementById('topBar').className = 'top-bar';
+  document.getElementById('headerContent').innerHTML = `
+    <h1>Tu ticket está<br><em style="color:var(--red)">${estado==='En Proceso'?'en proceso':'en espera'}</em></h1>
+    <p>Estamos trabajando en tu solicitud.<br>Aquí puedes ver el estado en tiempo real.</p>`;
+
+  document.getElementById('mainContent').innerHTML = `
+    <div class="ticket-card">
+      <div class="ticket-top">
+        <div><div class="ticket-id-label">Número de ticket</div><div class="ticket-id-num" style="color:var(--red)">#${id}</div></div>
+        <div class="ticket-status-wrap">${badge}<div class="ticket-date">Creado el ${fecha}</div></div>
+      </div>
+      <div class="queue-section">
+        <div class="section-label">Tu posición en la fila</div>
+        <div class="queue-visual">${filaHTML}</div>
+        <div class="queue-msg">📍 ${antes===0?'Eres el <strong>siguiente</strong> en ser atendido 🎉':`Hay <strong>${antes} ticket${antes>1?'s':''}</strong> antes que el tuyo.`}</div>
+      </div>
+      <div class="ticket-details">
+        <div class="details-grid">
+          <div><div class="detail-label">Categoría</div><div class="detail-value red">${getCategoria(ticket)}</div></div>
+          <div><div class="detail-label">Prioridad</div><div class="detail-value">🟡 ${getPrioridad(ticket)}</div></div>
+          <div><div class="detail-label">Solicitante</div><div class="detail-value">${getNombre(ticket)}</div></div>
+          <div><div class="detail-label">Ubicación</div><div class="detail-value">${getUbicacion(ticket)}</div></div>
+        </div>
+        ${tecnico!=='—'?`<div class="detail-label" style="margin-bottom:8px">Técnico asignado</div>
+        <div class="tecnico-card">
+          <div class="tec-avatar" style="background:var(--red)">${getInitials(tecnico)}</div>
+          <div><div class="tec-name">${tecnico}</div><div class="tec-role">Soporte TI — Lyncott</div></div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--green);font-weight:500"><span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block"></span>Activo</div>
+        </div>`:''}
+        <div class="detail-label" style="margin-bottom:8px">Tu solicitud</div>
+        <div class="desc-box">"${ticket.Descripci_x00f3_ndelaincidencia_||'—'}"</div>
+      </div>
+    </div>
+    <div class="timeline-card">
+      <div class="card-title">Historial del ticket</div>
+      <div class="tl">
+        <div class="tl-row"><div class="tl-icon done">✅</div><div class="tl-text"><div class="tl-title">Ticket recibido</div><div class="tl-time">${fecha}</div></div></div>
+        <div class="tl-row"><div class="tl-icon ${tecnico!=='—'?'done':'pending'}">${tecnico!=='—'?'✅':'🕐'}</div><div class="tl-text"><div class="tl-title ${tecnico==='—'?'dim':''}">Técnico asignado</div><div class="tl-time">${tecnico!=='—'?tecnico+' fue asignado':'Pendiente de asignación'}</div></div></div>
+        <div class="tl-row"><div class="tl-icon ${estado==='En Proceso'?'active':'pending'}">${estado==='En Proceso'?'⚡':'🕐'}</div><div class="tl-text"><div class="tl-title ${estado!=='En Proceso'?'dim':''}">En proceso</div><div class="tl-time">${estado==='En Proceso'?'El técnico está trabajando en tu ticket':'Próximamente'}</div></div></div>
+        <div class="tl-row"><div class="tl-icon pending">🔧</div><div class="tl-text"><div class="tl-title dim">Resolución</div><div class="tl-time">Recibirás un correo cuando sea resuelto</div></div></div>
+      </div>
+    </div>`;
+
+  document.getElementById('footerNote').textContent = `Este link es único para tu ticket #${id} — no lo compartas`;
+  document.getElementById('footer').style.display = 'block';
+}
+
+function renderResuelto(ticket) {
+  const id = ticket.ID;
+  const tecnico = getTecnico(ticket);
+  const solucion = getSolucion(ticket);
+  const fechaCreado = formatDate(ticket.Fechadecreacion||ticket.Created);
+  const fechaMod = formatDate(ticket.Modified);
+
+  document.getElementById('topBar').className = 'top-bar green';
+  document.getElementById('headerContent').innerHTML = `
+    <div style="font-size:64px;margin-bottom:16px">✅</div>
+    <h1>¡Tu ticket fue<br><em style="color:var(--green)">resuelto!</em></h1>
+    <p style="margin-top:12px">Tu solicitud fue atendida exitosamente.<br>Gracias por tu paciencia.</p>`;
+
+  document.getElementById('mainContent').innerHTML = `
+    <div class="ticket-card">
+      <div class="ticket-top">
+        <div><div class="ticket-id-label">Número de ticket</div><div class="ticket-id-num" style="color:var(--green)">#${id}</div></div>
+        <div class="ticket-status-wrap"><div class="status-badge status-atendido"><div class="dot"></div>Resuelto ✓</div><div class="ticket-date">Resuelto el ${fechaMod}</div></div>
+      </div>
+      <div class="ticket-details">
+        <div class="details-grid">
+          <div><div class="detail-label">Categoría</div><div class="detail-value red">${getCategoria(ticket)}</div></div>
+          <div><div class="detail-label">Solicitante</div><div class="detail-value">${getNombre(ticket)}</div></div>
+          <div><div class="detail-label">Creado</div><div class="detail-value">${fechaCreado}</div></div>
+          <div><div class="detail-label">Resuelto</div><div class="detail-value" style="color:var(--green);font-weight:700">${fechaMod}</div></div>
+        </div>
+        <div class="detail-label" style="margin-bottom:8px">Atendido por</div>
+        <div class="tecnico-card" style="border-color:#C0E8D2;background:var(--green-bg)">
+          <div class="tec-avatar" style="background:var(--green)">${getInitials(tecnico)}</div>
+          <div><div class="tec-name">${tecnico}</div><div class="tec-role">Soporte TI — Lyncott</div></div>
+          <div style="margin-left:auto;font-size:20px">✅</div>
+        </div>
+        ${solucion?`<div class="detail-label" style="margin-bottom:8px">Solución aplicada</div>
+        <div class="desc-box" style="background:var(--green-bg);border-color:#C0E8D2;font-style:normal">${solucion}</div>`:''}
+      </div>
+    </div>
+    <div class="timeline-card">
+      <div class="card-title green">Historial completo</div>
+      <div class="tl">
+        <div class="tl-row"><div class="tl-icon done">✅</div><div class="tl-text"><div class="tl-title">Ticket recibido</div><div class="tl-time">${fechaCreado}</div></div></div>
+        <div class="tl-row"><div class="tl-icon done">✅</div><div class="tl-text"><div class="tl-title">Técnico asignado</div><div class="tl-time">${tecnico}</div></div></div>
+        <div class="tl-row"><div class="tl-icon done">✅</div><div class="tl-text"><div class="tl-title">Ticket resuelto</div><div class="tl-time">${fechaMod}</div></div></div>
+      </div>
+    </div>
+    <div class="timeline-card" style="border-color:#C0E8D2">
+      <div class="card-title green">¿Cómo fue tu experiencia?</div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Tu opinión nos ayuda a mejorar el servicio</p>
+      <div style="display:flex;gap:12px;justify-content:center;margin-bottom:16px">
+        <button class="csat-btn" onclick="calificar(this)">😞</button>
+        <button class="csat-btn" onclick="calificar(this)">😐</button>
+        <button class="csat-btn" onclick="calificar(this)">😊</button>
+        <button class="csat-btn" onclick="calificar(this)">😄</button>
+        <button class="csat-btn" onclick="calificar(this)">🤩</button>
+      </div>
+      <div id="csat-msg" style="display:none;text-align:center;padding:12px;background:var(--green-bg);border-radius:10px;color:var(--green);font-weight:600;font-size:14px">¡Gracias por tu calificación! 🙌</div>
+    </div>`;
+
+  document.getElementById('footerNote').textContent = `Ticket #${id} cerrado exitosamente`;
+  document.getElementById('footer').style.display = 'block';
+}
+
+function renderError(msg) {
+  document.getElementById('headerContent').innerHTML = `<h1>Ticket <em style="color:var(--red)">no encontrado</em></h1>`;
+  document.getElementById('mainContent').innerHTML = `
+    <div class="error-box">
+      <div style="font-size:32px;margin-bottom:12px">🔍</div>
+      <div style="font-weight:700;margin-bottom:8px">${msg}</div>
+      <div style="font-size:12px;color:var(--muted)">Verifica el link que recibiste en tu correo</div>
+    </div>`;
+}
+
+function calificar(btn) {
+  document.querySelectorAll('.csat-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById('csat-msg').style.display='block';
+}
+
+async function init() {
+  const id = parseInt(getParam('id'));
+  if (!id) { renderError('No se especificó número de ticket.'); return; }
+  try {
+    const res = await fetch(JSON_URL+'?t='+Date.now());
+    if (!res.ok) throw new Error('Error '+res.status);
+    const tickets = await res.json();
+    const ticket = tickets.find(t=>t.ID===id);
+    if (!ticket) { renderError('El ticket #'+id+' no fue encontrado.'); return; }
+    const estado = getEstado(ticket);
+    if (estado==='Atendido') {
+      renderResuelto(ticket);
+    } else {
+      const abiertos = tickets.filter(t=>getEstado(t)!=='Atendido').sort((a,b)=>a.ID-b.ID);
+      renderProceso(ticket, abiertos);
+    }
+  } catch(e) {
+    renderError('Error al cargar datos: '+e.message);
+  }
+}
+
+init();
+setInterval(init, 60000);
+</script>
+</body>
+</html>
