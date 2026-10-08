@@ -115,7 +115,7 @@ const formatDate = s => {
 
 const getInitials = n => { if(!n||typeof n!=='string') return '?'; return n.split(' ').map(x=>x[0]).join('').toUpperCase().slice(0,2); };
 const getEstado = t => t.estado?.Value || t.estado || t.EstadodelTicket0?.Value || t.EstadodelTicket0 || 'Abierto';
-const getTecnico = t => t.tecnico || t.Personalqueatiendeelticket?.Value || t.Personalqueatiendeestasolicitud_?.Value || '—';
+const getTecnico = t => { const v = t.tecnico || t.Personalqueatiendeelticket || t.Personalqueatiendeestasolicitud_; if(!v) return '—'; if(typeof v==='string') return v; return v.Value || v.DisplayName || v.Email || '—'; };
 const getCategoria = t => t.categoria?.Value || t.categoria || t.SeleccionaelSoporteTecnicodesead?.Value || t.SeleccionaelSoporteTecnicodesead || '—';
 const getPrioridad = t => t.prioridad?.Value || t.prioridad || t.Nivelesdeprioridad_x003a_?.Value || '—';
 const getSolucion = t => t.solucion || t.Soluci_x00f3_naticket_x003a_ || '';
