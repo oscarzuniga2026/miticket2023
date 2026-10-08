@@ -102,7 +102,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',system-ui,sans
 </div>
 
 <script>
-const JSON_URL = 'https://lyncott.sharepoint.com/sites/MesadeAyudaLyncott/SiteAssets/tickets.json';
+const JSON_URL = 'https://api.jsonbin.io/v3/b/6ac803feac6210605a20c23c/latest';
+const JSONBIN_KEY = '$2a$10$TpBa7K20E/97qB.HEwFmmukQFnNC6T4j6SBbqcksWDVraJNXwfa3y';
 
 const getParam = n => new URLSearchParams(window.location.search).get(n);
 
@@ -275,7 +276,7 @@ async function init() {
   const id = parseInt(getParam('id'));
   if (!id) { renderError('No se especificó número de ticket.'); return; }
   try {
-    const res = await fetch(JSON_URL+'?t='+Date.now());
+    const res = await fetch(JSON_URL, {headers:{'X-Master-Key': JSONBIN_KEY, 'X-Bin-Meta': 'false'}});
     if (!res.ok) throw new Error('Error '+res.status);
     const tickets = await res.json();
     const ticket = tickets.find(t=>t.ID===id);
