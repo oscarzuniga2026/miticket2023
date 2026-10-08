@@ -114,34 +114,35 @@ const formatDate = s => {
 };
 
 const getInitials = n => n ? n.split(' ').map(x=>x[0]).join('').toUpperCase().slice(0,2) : '?';
-const getEstado = t => t.EstadodelTicket0?.Value || t.EstadodelTicket0 || 'Abierto';
-const getTecnico = t => t.Personalqueatiendeelticket?.Value || t.Personalqueatiendeestasolicitud_?.Value || '—';
-const getCategoria = t => t.SeleccionaelSoporteTecnicodesead?.Value || t.SeleccionaelSoporteTecnicodesead || '—';
-const getPrioridad = t => t.Nivelesdeprioridad_x003a_?.Value || '—';
-const getSolucion = t => t.Soluci_x00f3_naticket_x003a_ || '';
-const getNombre = t => t.Escribetunombre_x003a_ || '—';
-const getUbicacion = t => t.Selecionatuubicacion_x003a_?.Value || '—';
+const getEstado = t => t.estado?.Value || t.estado || t.EstadodelTicket0?.Value || t.EstadodelTicket0 || 'Abierto';
+const getTecnico = t => t.tecnico || t.Personalqueatiendeelticket?.Value || t.Personalqueatiendeestasolicitud_?.Value || '—';
+const getCategoria = t => t.categoria?.Value || t.categoria || t.SeleccionaelSoporteTecnicodesead?.Value || t.SeleccionaelSoporteTecnicodesead || '—';
+const getPrioridad = t => t.prioridad?.Value || t.prioridad || t.Nivelesdeprioridad_x003a_?.Value || '—';
+const getSolucion = t => t.solucion || t.Soluci_x00f3_naticket_x003a_ || '';
+const getNombre = t => t.nombre || t.Escribetunombre_x003a_ || '—';
+const getUbicacion = t => t.ubicacion?.Value || t.ubicacion || t.Selecionatuubicacion_x003a_?.Value || '—';
 
 function renderProceso(ticket, abiertos) {
-  const id = ticket.ID;
+  const id = ticket.id || ticket.ID;
   const estado = getEstado(ticket);
   const tecnico = getTecnico(ticket);
-  const antes = abiertos.filter(t => t.ID < id).length;
-  const fecha = formatDate(ticket.Fechadecreacion || ticket.Created);
+  const antes = abiertos.filter(t => (t.id||t.ID) < id).length;
+  const fecha = formatDate(ticket.fecha || ticket.Fechadecreacion || ticket.Created);
 
   // Fila visual — mostrar tickets cercanos
-  const idx = abiertos.findIndex(t => t.ID === id);
+  const idx = abiertos.findIndex(t => (t.id||t.ID) === id);
   const start = Math.max(0, idx - 2);
   const visibles = abiertos.slice(start, start + 6);
 
   let filaHTML = visibles.map((t, i) => {
+    const tid = t.id||t.ID;
     const e = getEstado(t);
-    let cls = 'waiting', icon = t.ID;
-    if (t.ID === id) { cls = 'mine'; }
+    let cls = 'waiting', icon = tid;
+    if (tid === id) { cls = 'mine'; }
     else if (e === 'Atendido') { cls = 'done'; icon = '✓'; }
     else if (e === 'En Proceso') { cls = 'active'; icon = '⚡'; }
     const linea = i < visibles.length-1 ? `<div class="q-line ${e==='Atendido'?'done':''}"></div>` : '';
-    return `<div class="q-item"><div class="q-bubble ${cls}">${icon}</div><div class="q-label ${t.ID===id?'mine':''}">${t.ID===id?'← Tú':'#'+t.ID}</div></div>${linea}`;
+    return `<div class="q-item"><div class="q-bubble ${cls}">${icon}</div><div class="q-label ${tid===id?'mine':''}">${tid===id?'← Tú':'#'+tid}</div></div>${linea}`;
   }).join('');
 
   const badge = estado === 'En Proceso'
@@ -178,7 +179,7 @@ function renderProceso(ticket, abiertos) {
           <div style="margin-left:auto;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--green);font-weight:500"><span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block"></span>Activo</div>
         </div>`:''}
         <div class="detail-label" style="margin-bottom:8px">Tu solicitud</div>
-        <div class="desc-box">"${ticket.Descripci_x00f3_ndelaincidencia_||'—'}"</div>
+        <div class="desc-box">"${ticket.descripcion||ticket.Descripci_x00f3_ndelaincidencia_||'—'}"</div>
       </div>
     </div>
     <div class="timeline-card">
@@ -196,10 +197,10 @@ function renderProceso(ticket, abiertos) {
 }
 
 function renderResuelto(ticket) {
-  const id = ticket.ID;
+  const id = ticket.id || ticket.ID;
   const tecnico = getTecnico(ticket);
   const solucion = getSolucion(ticket);
-  const fechaCreado = formatDate(ticket.Fechadecreacion||ticket.Created);
+  const fechaCreado = formatDate(ticket.fecha||ticket.Fechadecreacion||ticket.Created);
   const fechaMod = formatDate(ticket.Modified);
 
   document.getElementById('topBar').className = 'top-bar green';
@@ -286,7 +287,7 @@ async function init() {
     if (estado==='Atendido') {
       renderResuelto(ticket);
     } else {
-      const abiertos = tickets.filter(t=>getEstado(t)!=='Atendido').sort((a,b)=>a.ID-b.ID);
+      const abiertos = tickets.filter(t=>getEstado(t)!=='Atendido').sort((a,b)=>(a.id||a.ID)-(b.id||b.ID));
       renderProceso(ticket, abiertos);
     }
   } catch(e) {
